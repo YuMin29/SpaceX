@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SpaceX</string>
+    <string name="flight">Flight %d</string>
+    <string name="sort_oldest">Flight number: oldest</string>
+    <string name="sort_newest">Flight number: newest</string>
+    <string name="sort_by">Sort by:</string>
 </resources>
