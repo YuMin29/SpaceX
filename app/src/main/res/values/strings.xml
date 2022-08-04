@@ -4,4 +4,8 @@
     <string name="sort_oldest">Flight number: oldest</string>
     <string name="sort_newest">Flight number: newest</string>
     <string name="sort_by">Sort by:</string>
+    <string name="flight_number">Flight number</string>
+    <string name="mission_name">Mission name</string>
+    <string name="launch_date">Launch date</string>
+    <string name="launch_site">Launch site</string>
 </resources>

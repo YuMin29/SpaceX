@@ -4,10 +4,15 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/drawable/dialog_rounded_corner.xml" value="0.1895" />
+        <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/drawable/drawable_indicator.xml" value="0.125" />
         <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/drawable/ic_android_black_24dp.xml" value="0.12" />
         <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/drawable/ic_baseline_sort_24.xml" value="0.1305" />
-        <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/layout/activity_main.xml" value="0.12907608695652173" />
+        <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/layout/child_item_layout.xml" value="0.20652173913043478" />
+        <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/layout/fragment_detail.xml" value="0.4" />
         <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/layout/fragment_launch.xml" value="0.264" />
+        <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/layout/group_list_item.xml" value="0.20652173913043478" />
+        <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/layout/group_list_layout.xml" value="0.2" />
         <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/layout/header_item.xml" value="0.1413934426229508" />
         <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/layout/launch_item.xml" value="0.4" />
         <entry key="..\:/Users/stell/AndroidStudioProjects/SpaceX/app/src/main/res/layout/sort_bottom_dialog.xml" value="0.20240963855421687" />

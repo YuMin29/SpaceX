@@ -9,15 +9,17 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.yumin.spacex.R
-import com.yumin.spacex.viewmodel.ViewModelFactory
 import com.yumin.spacex.databinding.FragmentLaunchBinding
 import com.yumin.spacex.databinding.SortBottomDialogBinding
+import com.yumin.spacex.model.RocketItem
 import com.yumin.spacex.repository.RemoteRepository
 import com.yumin.spacex.viewmodel.LaunchViewModel
+import com.yumin.spacex.viewmodel.ViewModelFactory
 
-class LaunchFragment : Fragment() {
+class LaunchFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
     private lateinit var binding: FragmentLaunchBinding
 
     private lateinit var launchViewModel: LaunchViewModel
@@ -44,17 +46,14 @@ class LaunchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        launchViewModel = ViewModelProvider(this, ViewModelFactory(RemoteRepository()))
+        launchViewModel = ViewModelProvider(requireActivity(), ViewModelFactory(RemoteRepository()))
             .get(LaunchViewModel::class.java)
 
-        initRecyclerView()
-    }
-
-    private fun initRecyclerView() {
-        val launchAdapter = RecyclerViewAdapter()
-        binding.launchRecyclerView.adapter = launchAdapter
-        adapter = launchAdapter
-
+        launchViewModel.openItemEvent.observe(viewLifecycleOwner, Observer {
+            it.getContentIfNotHandled()?.let {
+                findNavController().navigate(R.id.showDetail)
+            }
+        })
 
         launchViewModel.rocketList.observe(viewLifecycleOwner, Observer { result ->
             adapter.updateItems(result)
@@ -86,9 +85,21 @@ class LaunchFragment : Fragment() {
                 launchViewModel.sortChanged(useOldest)
             }
         }
+
+        initRecyclerView()
+    }
+
+    private fun initRecyclerView() {
+        adapter = RecyclerViewAdapter()
+        adapter.setOnItemClickListener(this)
+        binding.launchRecyclerView.adapter = adapter
     }
 
     companion object {
         val TAG: String = LaunchFragment::class.java.simpleName
+    }
+
+    override fun onItemClick(view: View, item: RocketItem) {
+        launchViewModel.openItem(item);
     }
 }

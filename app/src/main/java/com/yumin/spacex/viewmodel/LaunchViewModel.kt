@@ -4,6 +4,9 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.yumin.spacex.R
+import com.yumin.spacex.common.Event
+import com.yumin.spacex.model.ChildItem
+import com.yumin.spacex.model.GroupItem
 import com.yumin.spacex.model.RocketItem
 import com.yumin.spacex.repository.RemoteRepository
 import io.reactivex.SingleObserver
@@ -18,6 +21,9 @@ class LaunchViewModel constructor(private val repository: RemoteRepository) : Vi
     var sortOldest = MutableLiveData<Boolean>()
     var sortChecked = MutableLiveData<Int>()
     var rocketList = MutableLiveData<List<RocketItem>>()
+    var selectedItem: MutableLiveData<RocketItem> = MutableLiveData()
+    var openItemEvent: MutableLiveData<Event<RocketItem>> = MutableLiveData()
+    var groupList = MutableLiveData<List<GroupItem>>()
 
     init {
         loadData()
@@ -59,6 +65,77 @@ class LaunchViewModel constructor(private val repository: RemoteRepository) : Vi
 
         val list = rocketList.value
         rocketList.postValue(list?.reversed())
+    }
+
+    fun openItem(item: RocketItem) {
+        selectedItem.postValue(item)
+        openItemEvent.postValue(Event(item))
+        groupList.postValue(generateGroupData(item))
+    }
+
+    private fun generateGroupData(item: RocketItem): MutableList<GroupItem> {
+        var groupItemList: MutableList<GroupItem> = mutableListOf()
+
+        if (item.rocket.firstStage != null) {
+            var coreSerial = ""
+            val childList: MutableList<ChildItem> = mutableListOf()
+            for (core in item.rocket.firstStage.cores) {
+                core.coreSerial?.let { coreSerial = it }
+
+                core.block?.let { childList.add(ChildItem("Block", it.toString())) }
+                    ?: { childList.add(ChildItem("Block", "No info")) }
+
+                core.flight?.let {
+                    childList.add(ChildItem("Flight", it.toString()))
+                } ?: {
+                    childList.add(ChildItem("Flight", "No info"))
+                }
+
+                core.reused?.let {
+                    childList.add(ChildItem("Reused", if (it) "Yes" else "No"))
+                } ?: {
+                    childList.add(ChildItem("Reused", "No info"))
+                }
+
+                core.landingType?.let {
+                    childList.add(ChildItem("Landing", it))
+                } ?: {
+                    childList.add(ChildItem("Landing", "No info"))
+                }
+            }
+            groupItemList.add(GroupItem(0, "Core", false, childList, coreSerial))
+        }
+
+        if (item.rocket.secondStage.payloads != null) {
+            val childList: MutableList<ChildItem> = mutableListOf()
+            for (payload in item.rocket.secondStage.payloads) {
+                payload.capSerial?.let {
+                    childList.add(ChildItem("capSerial", it))
+                } ?: {
+                    childList.add(ChildItem("capSerial", "No info"))
+                }
+
+                payload.cargoManifest?.let {
+                    childList.add(ChildItem("cargoManifest", it))
+                } ?: {
+                    childList.add(ChildItem("cargoManifest", "No info"))
+                }
+
+                payload.payloadId?.let {
+                    childList.add(ChildItem("payloadId", it))
+                } ?: {
+                    childList.add(ChildItem("payloadId", "No info"))
+                }
+
+                payload.manufacturer?.let {
+                    childList.add(ChildItem("manufacturer", it))
+                } ?: {
+                    childList.add(ChildItem("manufacturer", "No info"))
+                }
+            }
+            groupItemList.add(GroupItem(1, "Payload", false, childList, ""))
+        }
+        return groupItemList
     }
 
     private fun formatTime(originDate: String): String {

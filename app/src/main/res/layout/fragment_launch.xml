@@ -62,6 +62,7 @@
             tools:listitem="@layout/launch_item" />
 
         <ProgressBar
+            android:elevation="1dp"
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
