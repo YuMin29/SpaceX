@@ -8,4 +8,14 @@
     <string name="mission_name">Mission name</string>
     <string name="launch_date">Launch date</string>
     <string name="launch_site">Launch site</string>
+    <string name="block_title">Block</string>
+    <string name="flight_title">Flight</string>
+    <string name="reused_title">Reused</string>
+    <string name="landing_title">Landing</string>
+    <string name="cap_serial">Cap Serial</string>
+    <string name="nationality">Nationality</string>
+    <string name="payload_type">Payload Type</string>
+    <string name="manufacturer">Manufacturer</string>
+    <string name="no_info">No info</string>
+    <string name="youtube_id">Youtube id</string>
 </resources>

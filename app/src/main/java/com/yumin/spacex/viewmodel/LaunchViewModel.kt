@@ -75,66 +75,9 @@ class LaunchViewModel constructor(private val repository: RemoteRepository) : Vi
 
     private fun generateGroupData(item: RocketItem): MutableList<GroupItem> {
         var groupItemList: MutableList<GroupItem> = mutableListOf()
-
-        if (item.rocket.firstStage != null) {
-            var coreSerial = ""
-            val childList: MutableList<ChildItem> = mutableListOf()
-            for (core in item.rocket.firstStage.cores) {
-                core.coreSerial?.let { coreSerial = it }
-
-                core.block?.let { childList.add(ChildItem("Block", it.toString())) }
-                    ?: { childList.add(ChildItem("Block", "No info")) }
-
-                core.flight?.let {
-                    childList.add(ChildItem("Flight", it.toString()))
-                } ?: {
-                    childList.add(ChildItem("Flight", "No info"))
-                }
-
-                core.reused?.let {
-                    childList.add(ChildItem("Reused", if (it) "Yes" else "No"))
-                } ?: {
-                    childList.add(ChildItem("Reused", "No info"))
-                }
-
-                core.landingType?.let {
-                    childList.add(ChildItem("Landing", it))
-                } ?: {
-                    childList.add(ChildItem("Landing", "No info"))
-                }
-            }
-            groupItemList.add(GroupItem(0, "Core", false, childList, coreSerial))
-        }
-
-        if (item.rocket.secondStage.payloads != null) {
-            val childList: MutableList<ChildItem> = mutableListOf()
-            for (payload in item.rocket.secondStage.payloads) {
-                payload.capSerial?.let {
-                    childList.add(ChildItem("capSerial", it))
-                } ?: {
-                    childList.add(ChildItem("capSerial", "No info"))
-                }
-
-                payload.cargoManifest?.let {
-                    childList.add(ChildItem("cargoManifest", it))
-                } ?: {
-                    childList.add(ChildItem("cargoManifest", "No info"))
-                }
-
-                payload.payloadId?.let {
-                    childList.add(ChildItem("payloadId", it))
-                } ?: {
-                    childList.add(ChildItem("payloadId", "No info"))
-                }
-
-                payload.manufacturer?.let {
-                    childList.add(ChildItem("manufacturer", it))
-                } ?: {
-                    childList.add(ChildItem("manufacturer", "No info"))
-                }
-            }
-            groupItemList.add(GroupItem(1, "Payload", false, childList, ""))
-        }
+        groupItemList.add(0, GroupItem("Core",mutableListOf(item)))
+        groupItemList.add(1, GroupItem("Payload",mutableListOf(item)))
+        groupItemList.add(2, GroupItem("Links",mutableListOf(item)))
         return groupItemList
     }
 

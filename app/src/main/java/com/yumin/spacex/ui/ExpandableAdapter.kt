@@ -1,23 +1,38 @@
 package com.yumin.spacex.ui
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import com.yumin.spacex.R
-import com.yumin.spacex.databinding.ChildItemLayoutBinding
 import com.yumin.spacex.databinding.GroupListLayoutBinding
+import com.yumin.spacex.databinding.ItemCoreLayoutBinding
+import com.yumin.spacex.databinding.ItemLinksLayoutBinding
+import com.yumin.spacex.databinding.ItemPayloadLayoutBinding
 import com.yumin.spacex.model.ChildItem
 import com.yumin.spacex.model.GroupItem
+import com.yumin.spacex.model.RocketItem
 
 open class ExpandableAdapter : BaseExpandableListAdapter() {
     private val context: Context? = null
     private var groupListData: List<GroupItem> = emptyList()
 
+    companion object {
+        const val TYPE_CHILD_CORE = 0
+        const val TYPE_CHILD_PAYLOAD = 1
+        const val TYPE_CHILD_LINKS = 2
+    }
+
     fun setGroupList(list: List<GroupItem>) {
         groupListData = list
+    }
+
+    override fun getChildTypeCount(): Int {
+        return 3
     }
 
     override fun getGroupCount(): Int {
@@ -25,15 +40,15 @@ open class ExpandableAdapter : BaseExpandableListAdapter() {
     }
 
     override fun getChildrenCount(groupPosition: Int): Int {
-        return groupListData.get(groupPosition).childItemList.size
+        return groupListData[groupPosition].childItemList.size
     }
 
     override fun getGroup(groupPosition: Int): GroupItem {
-        return groupListData.get(groupPosition)
+        return groupListData[groupPosition]
     }
 
-    override fun getChild(groupPosition: Int, childPosition: Int): ChildItem {
-        return groupListData.get(groupPosition).childItemList.get(childPosition)
+    override fun getChild(groupPosition: Int, childPosition: Int): RocketItem {
+        return groupListData[groupPosition].childItemList[childPosition]
     }
 
     override fun getGroupId(groupPosition: Int): Long {
@@ -78,15 +93,40 @@ open class ExpandableAdapter : BaseExpandableListAdapter() {
         parent: ViewGroup?
     ): View {
         if (convertView == null) {
-            var binding = DataBindingUtil.inflate<ChildItemLayoutBinding>(
-                LayoutInflater.from(parent?.context),
-                R.layout.child_item_layout,
-                parent,
-                false
-            )
-            binding.groupItem = getGroup(groupPosition)
-            binding.childItem = getChild(groupPosition, childPosition)
-            return binding.root
+            when (getChildType(groupPosition, childPosition)) {
+                TYPE_CHILD_CORE -> {
+                    val binding = DataBindingUtil.inflate<ItemCoreLayoutBinding>(
+                        LayoutInflater.from(parent?.context),
+                        R.layout.item_core_layout,
+                        parent,
+                        false
+                    )
+                    binding.coreData = getChild(groupPosition, childPosition).rocket.firstStage.cores[0]
+                    return  binding.root
+                }
+
+                TYPE_CHILD_PAYLOAD -> {
+                    val binding = DataBindingUtil.inflate<ItemPayloadLayoutBinding>(
+                        LayoutInflater.from(parent?.context),
+                        R.layout.item_payload_layout,
+                        parent,
+                        false
+                    )
+                    binding.payloadData = getChild(groupPosition, childPosition).rocket.secondStage.payloads[0]
+                    return  binding.root
+                }
+
+                TYPE_CHILD_LINKS -> {
+                    val binding = DataBindingUtil.inflate<ItemLinksLayoutBinding>(
+                        LayoutInflater.from(parent?.context),
+                        R.layout.item_links_layout,
+                        parent,
+                        false
+                    )
+                    binding.linkData = getChild(groupPosition, childPosition).links
+                    return  binding.root
+                }
+            }
         }
         return convertView
     }
@@ -95,4 +135,12 @@ open class ExpandableAdapter : BaseExpandableListAdapter() {
         return false
     }
 
+    override fun getChildType(groupPosition: Int, childPosition: Int): Int {
+        return when (groupPosition) {
+            0 -> TYPE_CHILD_CORE
+            1 -> TYPE_CHILD_PAYLOAD
+            2 -> TYPE_CHILD_LINKS
+            else -> TYPE_CHILD_CORE
+        }
+    }
 }
