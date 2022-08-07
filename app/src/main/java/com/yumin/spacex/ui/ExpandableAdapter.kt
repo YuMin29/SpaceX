@@ -1,19 +1,16 @@
 package com.yumin.spacex.ui
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import com.yumin.spacex.R
 import com.yumin.spacex.databinding.GroupListLayoutBinding
 import com.yumin.spacex.databinding.ItemCoreLayoutBinding
 import com.yumin.spacex.databinding.ItemLinksLayoutBinding
 import com.yumin.spacex.databinding.ItemPayloadLayoutBinding
-import com.yumin.spacex.model.ChildItem
 import com.yumin.spacex.model.GroupItem
 import com.yumin.spacex.model.RocketItem
 

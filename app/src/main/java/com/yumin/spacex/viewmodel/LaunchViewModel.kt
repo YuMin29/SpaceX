@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.yumin.spacex.R
 import com.yumin.spacex.common.Event
-import com.yumin.spacex.model.ChildItem
 import com.yumin.spacex.model.GroupItem
 import com.yumin.spacex.model.RocketItem
 import com.yumin.spacex.repository.RemoteRepository
