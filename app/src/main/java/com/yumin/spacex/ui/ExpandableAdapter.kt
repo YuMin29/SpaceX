@@ -5,47 +5,48 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
-import androidx.databinding.DataBindingUtil
 import com.yumin.spacex.R
 import com.yumin.spacex.databinding.GroupListLayoutBinding
 import com.yumin.spacex.databinding.ItemCoreLayoutBinding
 import com.yumin.spacex.databinding.ItemLinksLayoutBinding
 import com.yumin.spacex.databinding.ItemPayloadLayoutBinding
-import com.yumin.spacex.model.GroupItem
+import com.yumin.spacex.model.ExpandableItem
 import com.yumin.spacex.model.RocketItem
 
-open class ExpandableAdapter : BaseExpandableListAdapter() {
-    private val context: Context? = null
-    private var groupListData: List<GroupItem> = emptyList()
+open class ExpandableAdapter(
+    private val context: Context,
+    private var expandableData: ExpandableItem
+) : BaseExpandableListAdapter() {
 
     companion object {
+        const val CHILD_COUNT = 3
         const val TYPE_CHILD_CORE = 0
         const val TYPE_CHILD_PAYLOAD = 1
         const val TYPE_CHILD_LINKS = 2
     }
 
-    fun setGroupList(list: List<GroupItem>) {
-        groupListData = list
+    fun setExpandableItem(item: ExpandableItem) {
+        expandableData = item
     }
 
     override fun getChildTypeCount(): Int {
-        return 3
+        return CHILD_COUNT
     }
 
     override fun getGroupCount(): Int {
-        return groupListData.size
+        return expandableData.groupList.size
     }
 
     override fun getChildrenCount(groupPosition: Int): Int {
-        return groupListData[groupPosition].childItemList.size
+        return 1
     }
 
-    override fun getGroup(groupPosition: Int): GroupItem {
-        return groupListData[groupPosition]
+    override fun getGroup(groupPosition: Int): String {
+        return expandableData.groupList[groupPosition]
     }
 
     override fun getChild(groupPosition: Int, childPosition: Int): RocketItem {
-        return groupListData[groupPosition].childItemList[childPosition]
+        return expandableData.childItem
     }
 
     override fun getGroupId(groupPosition: Int): Long {
@@ -66,13 +67,8 @@ open class ExpandableAdapter : BaseExpandableListAdapter() {
         convertView: View?,
         parent: ViewGroup?
     ): View {
-        var binding = DataBindingUtil.inflate<GroupListLayoutBinding>(
-            LayoutInflater.from(parent?.context),
-            R.layout.group_list_layout,
-            parent,
-            false
-        )
-        binding.groupItem = getGroup(groupPosition)
+        var binding = GroupListLayoutBinding.inflate(LayoutInflater.from(context))
+        binding.groupName.text = getGroup(groupPosition)
 
         if (isExpanded)
             binding.image.setBackgroundResource(R.drawable.ic_baseline_keyboard_arrow_down_24)
@@ -92,36 +88,66 @@ open class ExpandableAdapter : BaseExpandableListAdapter() {
         if (convertView == null) {
             when (getChildType(groupPosition, childPosition)) {
                 TYPE_CHILD_CORE -> {
-                    val binding = DataBindingUtil.inflate<ItemCoreLayoutBinding>(
-                        LayoutInflater.from(parent?.context),
-                        R.layout.item_core_layout,
-                        parent,
-                        false
-                    )
-                    binding.coreData = getChild(groupPosition, childPosition).rocket.firstStage.cores[0]
-                    return  binding.root
+                    val itemCoreLayoutBinding =
+                        ItemCoreLayoutBinding.inflate(LayoutInflater.from(context))
+                    val coreInfo = getChild(groupPosition, childPosition).rocket.firstStage.cores[0]
+                    itemCoreLayoutBinding.coreSerial.text = coreInfo.coreSerial
+
+                    coreInfo.block.toString().let {
+                        if (it.isNullOrEmpty())
+                            itemCoreLayoutBinding.blockVal.text =
+                                context.getString(R.string.no_info)
+                        else
+                            itemCoreLayoutBinding.blockVal.text = it
+                    }
+
+                    itemCoreLayoutBinding.flightVal.text = coreInfo.flight.toString()
+
+                    coreInfo.landingType.let {
+                        if (it.isNullOrEmpty())
+                            itemCoreLayoutBinding.landTypeVal.text =
+                                context.getString(R.string.no_info)
+                        else
+                            itemCoreLayoutBinding.landTypeVal.text = it
+                    }
+
+                    itemCoreLayoutBinding.reusedVal.text = coreInfo.reused.toString()
+                    return itemCoreLayoutBinding.root
                 }
 
                 TYPE_CHILD_PAYLOAD -> {
-                    val binding = DataBindingUtil.inflate<ItemPayloadLayoutBinding>(
-                        LayoutInflater.from(parent?.context),
-                        R.layout.item_payload_layout,
-                        parent,
-                        false
-                    )
-                    binding.payloadData = getChild(groupPosition, childPosition).rocket.secondStage.payloads[0]
-                    return  binding.root
+                    val itemPayloadLayoutBinding =
+                        ItemPayloadLayoutBinding.inflate(LayoutInflater.from(context))
+                    val payloadInfo =
+                        getChild(groupPosition, childPosition).rocket.secondStage.payloads[0]
+                    itemPayloadLayoutBinding.payloadId.text = payloadInfo.payloadId
+
+                    payloadInfo.capSerial.let {
+                        if (it.isNullOrEmpty())
+                            itemPayloadLayoutBinding.capVal.text =
+                                context.getString(R.string.no_info)
+                        else
+                            itemPayloadLayoutBinding.capVal.text = it
+                    }
+
+                    itemPayloadLayoutBinding.payloadVal.text = payloadInfo.payloadType
+                    itemPayloadLayoutBinding.manufacturerVal.text = payloadInfo.manufacturer
+                    itemPayloadLayoutBinding.nationalityVal.text = payloadInfo.nationality
+                    return itemPayloadLayoutBinding.root
                 }
 
                 TYPE_CHILD_LINKS -> {
-                    val binding = DataBindingUtil.inflate<ItemLinksLayoutBinding>(
-                        LayoutInflater.from(parent?.context),
-                        R.layout.item_links_layout,
-                        parent,
-                        false
-                    )
-                    binding.linkData = getChild(groupPosition, childPosition).links
-                    return  binding.root
+                    val itemLinksLayoutBinding =
+                        ItemLinksLayoutBinding.inflate(LayoutInflater.from(context))
+                    val linksInfo = getChild(groupPosition, childPosition).links
+                    linksInfo.youtubeId.let {
+                        if (it.isNullOrEmpty())
+                            itemLinksLayoutBinding.youtubeIdVal.text =
+                                context.getText(R.string.no_info)
+                        else
+                            itemLinksLayoutBinding.youtubeIdVal.text = it
+                    }
+                    return itemLinksLayoutBinding.root
                 }
             }
         }

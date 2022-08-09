@@ -1,6 +1,6 @@
 package com.yumin.spacex.common
 
-class Event<out T>(private val content: T) {
+class Event<T>(private val content: T) {
 
     var hasBeenHandled = false
         private set

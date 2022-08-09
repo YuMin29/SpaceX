@@ -1,11 +1,12 @@
 package com.yumin.spacex.viewmodel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.yumin.spacex.R
 import com.yumin.spacex.common.Event
-import com.yumin.spacex.model.GroupItem
+import com.yumin.spacex.model.ExpandableItem
 import com.yumin.spacex.model.RocketItem
 import com.yumin.spacex.repository.RemoteRepository
 import io.reactivex.SingleObserver
@@ -15,19 +16,26 @@ import io.reactivex.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
 
-class LaunchViewModel constructor(private val repository: RemoteRepository) : ViewModel() {
+class LaunchViewModel constructor(
+    private val repository: RemoteRepository,
+    private val context: Context
+) : ViewModel() {
     var isLoading = MutableLiveData<Boolean>()
     var sortOldest = MutableLiveData<Boolean>()
-    var sortChecked = MutableLiveData<Int>()
     var rocketList = MutableLiveData<List<RocketItem>>()
-    var selectedItem: MutableLiveData<RocketItem> = MutableLiveData()
+    var selectedRocketItem: MutableLiveData<RocketItem> = MutableLiveData()
     var openItemEvent: MutableLiveData<Event<RocketItem>> = MutableLiveData()
-    var groupList = MutableLiveData<List<GroupItem>>()
+    var expandableItem = MutableLiveData<ExpandableItem>()
 
     init {
         loadData()
-        sortOldest.postValue(true)
-        sortChecked.postValue(R.id.sortOldest)
+        sortOldest.value = true // default use oldest
+    }
+
+    companion object {
+        const val DATE_INPUT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        const val DATE_OUTPUT_PATTERN = "dd-MM-yyyy HH:mm:ss"
+        const val TIME_ZONE = "Asia/Taipei"
     }
 
     private fun loadData() {
@@ -36,54 +44,49 @@ class LaunchViewModel constructor(private val repository: RemoteRepository) : Vi
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : SingleObserver<List<RocketItem>> {
                 override fun onSubscribe(d: Disposable) {
-                    isLoading.postValue(true)
+                    isLoading.value = true
                 }
 
                 override fun onSuccess(list: List<RocketItem>) {
+                    Log.d("[LaunchViewModel]", "[onSuccess] list size = ${list.size}")
                     for (item in list) {
                         item.launchDateUtc.also { item.launchDateUtc = formatTime(it) }
                     }
-                    rocketList.postValue(list)
-                    isLoading.postValue(false)
+                    rocketList.value = list
+                    isLoading.value = false
                 }
 
                 override fun onError(e: Throwable) {
                     Log.e("[LaunchViewModel]", "[onError] ${e.message}")
-                    isLoading.postValue(false)
+                    isLoading.value = false
                 }
             })
     }
 
     fun sortChanged(useOldest: Boolean) {
-        sortOldest.postValue(useOldest)
-
-        if (useOldest)
-            sortChecked.postValue(R.id.sortOldest)
-        else
-            sortChecked.postValue(R.id.sortNewest)
-
-        val list = rocketList.value
-        rocketList.postValue(list?.reversed())
+        sortOldest.value = useOldest
+        rocketList.value = rocketList.value?.reversed()
     }
 
-    fun openItem(item: RocketItem) {
-        selectedItem.postValue(item)
-        openItemEvent.postValue(Event(item))
-        groupList.postValue(generateGroupData(item))
+    fun openRocketItem(item: RocketItem) {
+        selectedRocketItem.value = item
+        openItemEvent.value = Event(item)
+        expandableItem.value = generateExpandableItem(item)
     }
 
-    private fun generateGroupData(item: RocketItem): MutableList<GroupItem> {
-        var groupItemList: MutableList<GroupItem> = mutableListOf()
-        groupItemList.add(0, GroupItem("Core",mutableListOf(item)))
-        groupItemList.add(1, GroupItem("Payload",mutableListOf(item)))
-        groupItemList.add(2, GroupItem("Links",mutableListOf(item)))
-        return groupItemList
+    private fun generateExpandableItem(item: RocketItem): ExpandableItem {
+        val groupList = listOf(
+            context.getString(R.string.core),
+            context.getString(R.string.payloads),
+            context.getString(R.string.links)
+        )
+        return ExpandableItem(groupList, item)
     }
 
     private fun formatTime(originDate: String): String {
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-        val outputFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
-        outputFormat.timeZone = TimeZone.getTimeZone("Asia/Taipei")
+        val inputFormat = SimpleDateFormat(DATE_INPUT_PATTERN)
+        val outputFormat = SimpleDateFormat(DATE_OUTPUT_PATTERN)
+        outputFormat.timeZone = TimeZone.getTimeZone(TIME_ZONE)
         val date: Date = inputFormat.parse(originDate)
         return outputFormat.format(date)
     }

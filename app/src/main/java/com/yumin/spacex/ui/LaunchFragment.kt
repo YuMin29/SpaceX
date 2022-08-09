@@ -1,11 +1,10 @@
 package com.yumin.spacex.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RadioGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -20,34 +19,31 @@ import com.yumin.spacex.viewmodel.LaunchViewModel
 import com.yumin.spacex.viewmodel.ViewModelFactory
 
 class LaunchFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
-    private lateinit var binding: FragmentLaunchBinding
-
+    private lateinit var fragmentLaunchBinding: FragmentLaunchBinding
     private lateinit var launchViewModel: LaunchViewModel
-
-    private lateinit var adapter: RecyclerViewAdapter
-
+    private lateinit var recyclerViewAdapter: RecyclerViewAdapter
+    private lateinit var getContext: Context
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate<FragmentLaunchBinding>(
-            inflater,
-            R.layout.fragment_launch,
-            container,
-            false
-        )
-        binding.executePendingBindings()
-        return binding.root
+        fragmentLaunchBinding = FragmentLaunchBinding.inflate(inflater)
+        return fragmentLaunchBinding.root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        this.getContext = context
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.lifecycleOwner = viewLifecycleOwner
 
-        launchViewModel = ViewModelProvider(requireActivity(), ViewModelFactory(RemoteRepository()))
-            .get(LaunchViewModel::class.java)
+        launchViewModel =
+            ViewModelProvider(requireActivity(), ViewModelFactory(RemoteRepository(), getContext))
+                .get(LaunchViewModel::class.java)
 
         launchViewModel.openItemEvent.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {
@@ -56,50 +52,49 @@ class LaunchFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
         })
 
         launchViewModel.rocketList.observe(viewLifecycleOwner, Observer { result ->
-            adapter.updateItems(result)
+            recyclerViewAdapter = RecyclerViewAdapter(this, getContext, result)
+            fragmentLaunchBinding.launchRecyclerView.adapter = recyclerViewAdapter
         })
 
         launchViewModel.sortOldest.observe(viewLifecycleOwner, Observer {
             if (it)
-                binding.sortTextView.setText(R.string.sort_oldest)
+                fragmentLaunchBinding.sortTextView.setText(R.string.sort_oldest)
             else
-                binding.sortTextView.setText(R.string.sort_newest)
+                fragmentLaunchBinding.sortTextView.setText(R.string.sort_newest)
+
         })
 
-        binding.callback = object : SortCallback {
-            override fun openSortDialog() {
-                val dialog = context?.let { BottomSheetDialog(it) }
-                val dialogBinding = DataBindingUtil.inflate<SortBottomDialogBinding>(
-                    layoutInflater, R.layout.sort_bottom_dialog, null, false
-                )
-                dialogBinding.root.setBackgroundResource(R.drawable.dialog_rounded_corner)
-                dialogBinding.viewModel = launchViewModel
-                binding.callback.also { dialogBinding.callback = it }
+        launchViewModel.isLoading.observe(viewLifecycleOwner, Observer {
+            if (it)
+                fragmentLaunchBinding.progressBar.visibility = View.VISIBLE
+            else
+                fragmentLaunchBinding.progressBar.visibility = View.INVISIBLE
+        })
 
-                dialog?.setContentView(dialogBinding.root)
-                dialog?.show()
-            }
-
-            override fun sortChanged(radioGroup: RadioGroup, id: Int) {
-                var useOldest: Boolean = id == R.id.sortOldest
-                launchViewModel.sortChanged(useOldest)
-            }
+        fragmentLaunchBinding.sortTextView.setOnClickListener {
+            openSortDialog(it.context)
         }
-
-        initRecyclerView()
-    }
-
-    private fun initRecyclerView() {
-        adapter = RecyclerViewAdapter()
-        adapter.setOnItemClickListener(this)
-        binding.launchRecyclerView.adapter = adapter
-    }
-
-    companion object {
-        val TAG: String = LaunchFragment::class.java.simpleName
     }
 
     override fun onItemClick(view: View, item: RocketItem) {
-        launchViewModel.openItem(item);
+        launchViewModel.openRocketItem(item);
+    }
+
+    private fun openSortDialog(context: Context) {
+        val bottomSheetDialog = BottomSheetDialog(context)
+        val sortBottomDialogBinding = SortBottomDialogBinding.inflate(LayoutInflater.from(context))
+        sortBottomDialogBinding.root.setBackgroundResource(R.drawable.dialog_rounded_corner)
+
+        if (launchViewModel.sortOldest.value == true)
+            sortBottomDialogBinding.sortGroup.check(R.id.sortOldest)
+        else
+            sortBottomDialogBinding.sortGroup.check(R.id.sortNewest)
+
+        sortBottomDialogBinding.sortGroup.setOnCheckedChangeListener { radioGroup, id ->
+            var useOldest: Boolean = id == R.id.sortOldest
+            launchViewModel.sortChanged(useOldest)
+        }
+        bottomSheetDialog.setContentView(sortBottomDialogBinding.root)
+        bottomSheetDialog.show()
     }
 }

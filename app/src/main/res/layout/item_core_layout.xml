@@ -1,137 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <variable
-            name="coreData"
-            type="com.yumin.spacex.model.Core" />
-    </data>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/coreSerial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        app:layout_constraintBottom_toTopOf="@+id/content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Title" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/coreSerial">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <TextView
+            android:id="@+id/blockTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/block_title"
+            app:layout_constraintEnd_toEndOf="@+id/guideline3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/blockVal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintEnd_toEndOf="@+id/guideline3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/blockTitle"
+            tools:text="BlockVal" />
+
+        <TextView
+            android:id="@+id/flight"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/flight_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/flightVal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            app:layout_constraintTop_toBottomOf="@+id/flight"
+            tools:text="FlightVal" />
 
 
         <TextView
-            android:id="@+id/textView2"
-            android:layout_width="match_parent"
+            android:id="@+id/reused"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{coreData.coreSerial}"
+            android:layout_marginTop="8dp"
             android:gravity="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/reused_title"
+            app:layout_constraintEnd_toEndOf="@id/guideline3"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/content"
-            tools:text="Title" />
+            app:layout_constraintTop_toBottomOf="@+id/blockVal" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/content"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/reusedVal"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintEnd_toEndOf="@+id/guideline3"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2">
+            app:layout_constraintTop_toBottomOf="@+id/reused"
+            tools:text="ReusedVal" />
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.5"/>
+        <TextView
+            android:id="@+id/landing"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/landing_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            app:layout_constraintTop_toBottomOf="@+id/flightVal" />
 
-            <TextView
-                android:id="@+id/capSerial"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                app:layout_constraintEnd_toEndOf="@+id/guideline3"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                android:text="@string/block_title"/>
-
-            <TextView
-                android:id="@+id/blockVal"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                app:layout_constraintEnd_toEndOf="@+id/guideline3"
-                app:layout_constraintTop_toBottomOf="@+id/capSerial"
-                app:layout_constraintStart_toStartOf="parent"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                tools:text="BlockVal"
-                android:text="@{String.valueOf(coreData.block) ?? @string/no_info}"/>
-
-            <TextView
-                android:id="@+id/flight"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/guideline3"
-                android:text="@string/flight_title"/>
-
-            <TextView
-                android:id="@+id/flightVal"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/flight"
-                app:layout_constraintStart_toStartOf="@+id/guideline3"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                tools:text="FlightVal"
-                android:text="@{String.valueOf(coreData.flight) ?? @string/no_info}"/>
-
-
-            <TextView
-                android:id="@+id/reused"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="@id/guideline3"
-                app:layout_constraintTop_toBottomOf="@+id/blockVal"
-                app:layout_constraintStart_toStartOf="parent"
-                android:text="@string/reused_title"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                app:layout_constraintEnd_toEndOf="@+id/guideline3"
-                app:layout_constraintTop_toBottomOf="@+id/reused"
-                app:layout_constraintStart_toStartOf="parent"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                tools:text="ReusedVal"
-                android:text="@{String.valueOf(coreData.reused)}"/>
-
-            <TextView
-                android:id="@+id/landing"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/flightVal"
-                app:layout_constraintStart_toStartOf="@+id/guideline3"
-                android:text="@string/landing_title"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/landing"
-                app:layout_constraintStart_toStartOf="@+id/guideline3"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                tools:text="LandingVal"
-                android:text="@{coreData.landingType ?? @string/no_info}"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/landTypeVal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            app:layout_constraintTop_toBottomOf="@+id/landing"
+            tools:text="LandingVal" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -24,7 +24,6 @@ class RemoteApiManager private constructor() {
 
     companion object {
         private var retrofitManager: RemoteApiManager? = null
-
         @Synchronized
         fun newInstance(): RemoteApiManager {
             if (retrofitManager == null) {
