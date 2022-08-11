@@ -6,34 +6,25 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-class RemoteApiManager private constructor() {
-    private val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(RemoteApiService.BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build()
-    }
+object RemoteApiManager {
 
-    private val okHttpClient: OkHttpClient by lazy {
-        OkHttpClient.Builder()
-            .connectTimeout(5000, TimeUnit.MILLISECONDS)
-            .build()
-    }
+    private const val BASE_URL = "https://api.spacexdata.com/v3/"
+    val remoteApiService: RemoteApiService
 
-    companion object {
-        private var retrofitManager: RemoteApiManager? = null
-        @Synchronized
-        fun newInstance(): RemoteApiManager {
-            if (retrofitManager == null) {
-                retrofitManager = RemoteApiManager()
-            }
-            return retrofitManager as RemoteApiManager
-        }
-    }
+    init {
+        val okHttpClient: OkHttpClient =
+            OkHttpClient.Builder()
+                .connectTimeout(5000, TimeUnit.MILLISECONDS)
+                .build()
 
-    fun <T> create(t: Class<T>): T {
-        return retrofit.create(t)
+        val retrofit: Retrofit =
+            Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
+
+        remoteApiService = retrofit.create(RemoteApiService::class.java)
     }
 }

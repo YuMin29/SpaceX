@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.yumin.spacex.R
 import com.yumin.spacex.common.Event
 import com.yumin.spacex.model.ExpandableItem
@@ -13,6 +14,8 @@ import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,28 +42,16 @@ class LaunchViewModel constructor(
     }
 
     private fun loadData() {
-        repository.getRocket()
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : SingleObserver<List<RocketItem>> {
-                override fun onSubscribe(d: Disposable) {
-                    isLoading.value = true
-                }
-
-                override fun onSuccess(list: List<RocketItem>) {
-                    Log.d("[LaunchViewModel]", "[onSuccess] list size = ${list.size}")
-                    for (item in list) {
-                        item.launchDateUtc.also { item.launchDateUtc = formatTime(it) }
-                    }
-                    rocketList.value = list
-                    isLoading.value = false
-                }
-
-                override fun onError(e: Throwable) {
-                    Log.e("[LaunchViewModel]", "[onError] ${e.message}")
-                    isLoading.value = false
-                }
-            })
+        isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                isLoading.postValue(false)
+                rocketList.postValue(repository.getRocket())
+            } catch (e:Exception) {
+                Log.e("[LaunchViewModel]", "[onError] ${e.message}")
+                isLoading.postValue(false)
+            }
+        }
     }
 
     fun sortChanged(useOldest: Boolean) {
